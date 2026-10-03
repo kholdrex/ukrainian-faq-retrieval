@@ -24,8 +24,8 @@ def _encoder(name):
     return lambda texts: st.encode(texts, batch_size=64, convert_to_numpy=True)
 
 
-def fingerprint(texts: list[str]) -> str:
-    return hashlib.sha256("\n".join(texts).encode()).hexdigest()
+def fingerprint(texts: list[str], settings: str = "") -> str:
+    return hashlib.sha256(json.dumps([settings, texts], ensure_ascii=False).encode()).hexdigest()
 
 
 def cached_vectors(path, texts, encoder):
@@ -33,7 +33,7 @@ def cached_vectors(path, texts, encoder):
     key = fingerprint(texts)
     if path.exists():
         stored = np.load(path)
-        if str(stored["fingerprint"]) == key:
+        if str(stored["fingerprint"]) == key and len(stored["vectors"]) == len(texts):
             return stored["vectors"], None
     path.parent.mkdir(parents=True, exist_ok=True)
     vectors, seconds = timed(encoder, texts)

@@ -44,8 +44,10 @@ def _ndcg(rankings, queries, ids):
 def run() -> dict:
     corpus, test, dev, _ = load()
     ids = [d["id"] for d in corpus]
-    docs = normalize(np.load(CACHE / "docs_bge-m3.npz")["vectors"])
+    docs = normalize(cached_vectors(CACHE / "docs_bge-m3.npz", [d["text"] for d in corpus], lambda t: ollama_embed("bge-m3", t))[0])
     expansions = {row["id"]: row["answer"] for row in read_jsonl(RESULTS / "expansions.jsonl")}
+    queries_by_id = {row["id"]: row["query"] for row in read_jsonl(RESULTS / "expansions.jsonl")}
+    assert all(queries_by_id[q["id"]] == q["text"] for q in test + dev), "expansions do not match the questions"
     queries = test + dev
     q_vec = _cached("plain", [q["text"] for q in queries])
     a_vec = _cached("answer", [expansions[q["id"]] for q in queries])

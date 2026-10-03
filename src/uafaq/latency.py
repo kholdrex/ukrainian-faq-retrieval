@@ -11,7 +11,7 @@ import numpy as np
 from .config import CACHE, DENSE_MODELS, RESULTS, RRF_K
 from .data import load
 from .expansion import expand
-from .experiment import _encoder
+from .experiment import _encoder, cached_vectors
 from .retrieval import BM25, CharTfidf, Dense, rrf
 
 N_QUERIES = 100
@@ -33,7 +33,9 @@ def measure() -> None:
     docs = [d["text"] for d in corpus]
     queries = [q["text"] for q in test[:N_QUERIES]]
     bm25, char = BM25().fit(docs), CharTfidf().fit(docs)
-    dense = {name: Dense(np.load(CACHE / f"docs_{name}.npz")["vectors"], _encoder(name)) for name in DENSE_MODELS}
+    encoders = {name: _encoder(name) for name in DENSE_MODELS}
+    dense = {name: Dense(cached_vectors(CACHE / f"docs_{name}.npz", docs, encoders[name])[0], encoders[name])
+             for name in DENSE_MODELS}
     for retriever in dense.values():
         retriever.search(["прогрів"])
     expand(queries[0])
