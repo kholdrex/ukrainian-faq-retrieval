@@ -1,0 +1,10 @@
+{
+  "title": "Retrieval of Ukrainian FAQ answers: code and data",
+  "upload_type": "software",
+  "creators": [{"name": "Kholodniak, Oleksandr", "orcid": "0009-0000-1012-7361",
+                "affiliation": "National Aerospace University \"Kharkiv Aviation Institute\""}],
+  "description": "Code, LLM query expansions and analysis comparing BM25, character n-gram TF-IDF, multilingual MiniLM, BGE-M3, reciprocal rank fusion and LLM query expansion for Ukrainian FAQ retrieval on WebFAQ with 2,000 to 67,721 answers.",
+  "license": "MIT",
+  "keywords": ["retrieval-augmented generation", "dense retrieval", "BM25", "query expansion", "Ukrainian"],
+  "version": "1.0.0"
+}

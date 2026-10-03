@@ -1,0 +1,5 @@
+{"step": "embed_corpus", "model": "bge-m3", "docs": 67721, "seconds": 2115.4114370830357}
+{"step": "embed_corpus", "model": "mminilm", "docs": 67721, "seconds": 117.38023795932531}
+{"step": "build_lexical", "pool": "2000", "docs": 2000, "bm25_s": 0.06654287502169609, "char_s": 0.6084761251695454}
+{"step": "build_lexical", "pool": "10000", "docs": 10000, "bm25_s": 0.3147812499664724, "char_s": 2.830381582956761}
+{"step": "build_lexical", "pool": "full", "docs": 67721, "bm25_s": 1.7744292500428855, "char_s": 19.262291833292693}

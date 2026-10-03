@@ -1,9 +1,10 @@
 """Runs every retriever on every corpus pool and stores rankings, per-query metrics and timings."""
+import hashlib
 import json
 
 import numpy as np
 
-from .config import CACHE, DENSE_MODELS, RESULTS, RRF_K
+from .config import CACHE, DENSE_MODELS, RESULTS, REVISIONS, RRF_K
 from .data import load, read_jsonl
 from .expansion import expand
 from .metrics import per_query
@@ -16,18 +17,34 @@ def _encoder(name):
     kind, model = DENSE_MODELS[name]
     if kind == "ollama":
         return lambda texts: ollama_embed(model, texts)
+    import torch
     from sentence_transformers import SentenceTransformer
-    st = SentenceTransformer(model, device="mps")
+    device = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
+    st = SentenceTransformer(model, device=device, revision=REVISIONS[model])
     return lambda texts: st.encode(texts, batch_size=64, convert_to_numpy=True)
 
 
-def doc_vectors(name, corpus, encoder):
-    path = CACHE / f"docs_{name}.npy"
+def fingerprint(texts: list[str]) -> str:
+    return hashlib.sha256("\n".join(texts).encode()).hexdigest()
+
+
+def cached_vectors(path, texts, encoder):
+    """Vectors of `texts`, reused from `path` only if they were computed for exactly these texts in this order."""
+    key = fingerprint(texts)
     if path.exists():
-        return np.load(path)
+        stored = np.load(path)
+        if str(stored["fingerprint"]) == key:
+            return stored["vectors"], None
     path.parent.mkdir(parents=True, exist_ok=True)
-    vectors, seconds = timed(encoder, [d["text"] for d in corpus])
-    np.save(path, vectors)
+    vectors, seconds = timed(encoder, texts)
+    np.savez(path, vectors=vectors, fingerprint=key)
+    return vectors, seconds
+
+
+def doc_vectors(name, corpus, encoder):
+    vectors, seconds = cached_vectors(CACHE / f"docs_{name}.npz", [d["text"] for d in corpus], encoder)
+    if seconds is None:
+        return vectors
     _append(RESULTS / "timings.jsonl", {"step": "embed_corpus", "model": name, "docs": len(corpus),
                                         "seconds": seconds})
     return vectors
@@ -36,8 +53,8 @@ def doc_vectors(name, corpus, encoder):
 def expansions(queries):
     done = {row["id"]: row for row in read_jsonl(EXPANSIONS)} if EXPANSIONS.exists() else {}
     for query in queries:
-        if query["id"] not in done:
-            done[query["id"]] = {"id": query["id"], **expand(query["text"])}
+        if query["id"] not in done or done[query["id"]]["query"] != query["text"]:
+            done[query["id"]] = {"id": query["id"], "query": query["text"], **expand(query["text"])}
             _append(EXPANSIONS, done[query["id"]])
     return [done[q["id"]] for q in queries]
 

@@ -4,12 +4,12 @@ import random
 
 from datasets import load_dataset
 
-from .config import DATA, DATASET, N_DEV, N_TEST, POOL_SIZES, SEED
+from .config import DATA, DATASET, DATASET_REVISION, N_DEV, N_TEST, POOL_SIZES, SEED
 from .text import normalise
 
 
 def _canonical_corpus():
-    corpus = load_dataset(DATASET, "ukr-corpus")["corpus"]
+    corpus = load_dataset(DATASET, "ukr-corpus", revision=DATASET_REVISION)["corpus"]
     canonical, texts, alias = {}, {}, {}
     for row in corpus:
         key = " ".join(normalise(row["text"]).split())
@@ -21,8 +21,8 @@ def _canonical_corpus():
 
 
 def _queries(split, alias):
-    queries = load_dataset(DATASET, "ukr-queries")[split]
-    qrels = load_dataset(DATASET, "ukr-qrels")[split]
+    queries = load_dataset(DATASET, "ukr-queries", revision=DATASET_REVISION)[split]
+    qrels = load_dataset(DATASET, "ukr-qrels", revision=DATASET_REVISION)[split]
     relevant = {}
     for row in qrels:
         if row["score"] > 0:
