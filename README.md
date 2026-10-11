@@ -2,8 +2,8 @@
 
 Archived on Zenodo: [doi:10.5281/zenodo.23304682](https://doi.org/10.5281/zenodo.23304682).
 
-Code, generated query expansions and analysis for the paper *Lexical, dense, hybrid and LLM-expanded retrieval of
-Ukrainian FAQ answers as the collection grows* (O. Kholodniak).
+Code, generated query expansions and analysis for the paper *Lexical, dense, hybrid and language-model-expanded
+retrieval of Ukrainian answers to frequently asked questions* (O. Kholodniak).
 
 On the Ukrainian part of WebFAQ (1,000 test questions; collections of 2,000, 10,000 and 67,721 answers) the following
 retrievers are compared (`retrieval.py`, `experiment.py`):
