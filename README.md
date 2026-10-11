@@ -45,14 +45,18 @@ Python 3.11+ and [uv](https://docs.astral.sh/uv/). `requirements.lock.txt` lists
 
 ```bash
 uv venv && uv pip install -r requirements.lock.txt && uv pip install -e ".[dev]" --no-deps
-uv run pytest
-uv run uafaq data            # corpus and samples from WebFAQ
-uv run uafaq run             # needs Ollama with bge-m3 and qwen2.5:7b-instruct; expansions resume from results/
-uv run uafaq exploratory
-uv run uafaq latency         # run on an otherwise idle machine
-uv run uafaq report
+uv run --no-sync pytest
+uv run --no-sync uafaq data            # corpus and samples from WebFAQ
+uv run --no-sync uafaq run             # needs Ollama with bge-m3 and qwen2.5:7b-instruct; expansions resume from results/
+uv run --no-sync uafaq exploratory
+uv run --no-sync uafaq latency         # run on an otherwise idle machine
+uv run --no-sync uafaq report
 ```
+
+Cached vectors in `.cache/` are checked against the exact list of texts but not against the encoder, so check the model
+digests above with `ollama list` before reusing them, or delete `.cache/` after a model update. `latency` does not time
+BM25 over the expanded query.
 
 ## License
 
-Code: MIT. WebFAQ is distributed under CC BY 4.0; the stored samples contain question ids and texts from it.
+Code: MIT. The stored samples contain question ids and texts from WebFAQ (CC BY 4.0); see `THIRD_PARTY_NOTICES.md`.

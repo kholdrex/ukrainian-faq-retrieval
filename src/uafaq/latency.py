@@ -1,7 +1,8 @@
 """Single-query latency on the full collection, one query at a time with warm models, on an otherwise idle machine.
 
-Each retriever is timed end to end: query encoding (for dense retrievers), scoring of all answers and ranking. For the
-expanded variants the time also includes generating the hypothetical answer.
+Each retriever except BM25 over the expanded query (`bm25_exp`) is timed end to end: query encoding (for dense
+retrievers), scoring of all answers and ranking. For the expanded dense variants the time also includes generating the
+hypothetical answer; `expansion` times the generation alone.
 """
 import json
 import time
