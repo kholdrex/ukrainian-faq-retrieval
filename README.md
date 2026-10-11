@@ -1,5 +1,7 @@
 # Retrieval of Ukrainian FAQ answers
 
+Archived on Zenodo: [doi:10.5281/zenodo.23304682](https://doi.org/10.5281/zenodo.23304682).
+
 Code, generated query expansions and analysis for the paper *Lexical, dense, hybrid and LLM-expanded retrieval of
 Ukrainian FAQ answers as the collection grows* (O. Kholodniak).
 
